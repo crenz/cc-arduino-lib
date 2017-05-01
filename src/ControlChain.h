@@ -3,6 +3,10 @@
 
 #define TX_DRIVER_PIN   2
 
+#ifdef ARDUINO_ARCH_ESP8266 
+void serialEvent(void);
+#endif
+
 class ControlChain {
     public:
         void init()
@@ -11,6 +15,10 @@ class ControlChain {
             pinMode(TX_DRIVER_PIN, OUTPUT);
             digitalWrite(TX_DRIVER_PIN, LOW);
 
+#ifdef ARDUINO_ARCH_ESP8266
+            // use built-in RNG
+            srand(os_random());
+#else
             // generate seed by reading ADC
             int seed = 0;
             for (int i = 0; i < 5; i++)
@@ -18,6 +26,7 @@ class ControlChain {
 
             // init random generator
             srand(seed);
+#endif
 
             Serial.begin(CC_BAUD_RATE);
             cc_init(responseCB, 0);
@@ -25,6 +34,9 @@ class ControlChain {
 
         void run()
         {
+#ifdef ARDUINO_ARCH_ESP8266
+            serialEvent();
+#endif
             cc_process();
         }
 
