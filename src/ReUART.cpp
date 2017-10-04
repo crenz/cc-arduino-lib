@@ -136,3 +136,14 @@ size_t HwSerial::write(const uint8_t c)
 #ifdef ARDUINO_ARCH_SAMD
 // TODO
 #endif // end of ARDUINO_ARCH_SAMD
+
+
+////////////////////////////////////////////////////////////////////////////////
+// esp8266
+
+#ifdef ARDUINO_ARCH_ESP8266
+
+//todo ouch
+HardwareSerial CCSerial(0);
+
+#endif

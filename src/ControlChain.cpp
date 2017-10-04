@@ -11,6 +11,10 @@ void ControlChain::begin() {
     pinMode(TX_DRIVER_PIN, OUTPUT);
     digitalWrite(TX_DRIVER_PIN, LOW);
 
+#ifdef ARDUINO_ARCH_ESP8266
+            // use built-in RNG
+            srand(os_random());
+#else
     // generate seed by reading ADC
     int seed = 0;
     for (int i = 0; i < 5; i++)
@@ -18,12 +22,16 @@ void ControlChain::begin() {
 
     // init random generator
     srand(seed);
+#endif
 
     CCSerial.begin(CC_BAUD_RATE_FALLBACK);
     cc_init(responseCB, eventsCB);
 }
 
 void ControlChain::run() {
+#ifdef ARDUINO_ARCH_ESP8266
+            espSerialEvent();
+#endif
     cc_process();
 }
 
@@ -73,5 +81,22 @@ void ControlChain::eventsCB(void *arg) {
 
         if (update_cb)
             update_cb(assignment);
+    }
+}
+
+void ControlChain::espSerialEvent(void) {
+    uint8_t buffer[32];
+
+    cc_data_t received;
+    received.data = buffer;
+    received.size = Serial.available();
+
+    if (received.size > sizeof(buffer))
+        received.size = sizeof(buffer);
+
+    if (received.size > 0)
+    {
+        Serial.readBytes(received.data, received.size);
+        cc_parse(&received);
     }
 }

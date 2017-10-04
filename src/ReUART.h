@@ -44,4 +44,9 @@ extern HwSerial CCSerial;
 // TODO
 #endif
 
+// esp8266
+#ifdef ARDUINO_ARCH_ESP8266
+extern HardwareSerial CCSerial;
+#endif
+
 #endif

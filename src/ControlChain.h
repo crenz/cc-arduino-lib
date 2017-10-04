@@ -16,8 +16,11 @@ class ControlChain {
         cc_actuator_t* newActuator(cc_actuator_config_t *actuator_config);
         void addActuator(cc_device_t *device, cc_actuator_t *actuator);
         void setEventCallback(int event_id, void (*function_cb)(void *arg));
+#ifdef ARDUINO_ARCH_ESP8266
+        void espSerialEvent(void);
+#endif
 
-    private:
+private:
         static void responseCB(void *arg);
         static void eventsCB(void *arg);
 
